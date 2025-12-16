@@ -43,6 +43,9 @@ class Model(pl.LightningModule):
             {'params': [self.sk_prompt] + [self.img_prompt], 'lr': self.opts.prompt_lr}])
         return optimizer
 
+    def on_validation_epoch_start(self):
+        self.val_step_outputs = []
+        
     def forward(self, data, dtype='image'):
         if dtype == 'image':
             feat = self.clip.encode_image(
@@ -78,7 +81,7 @@ class Model(pl.LightningModule):
         ))
         return sk_feat, img_feat, category
 
-    def validation_epoch_end(self):
+    def on_validation_epoch_end(self):
         Len = len(self.val_step_outputs)
         if Len == 0:
             return
@@ -102,3 +105,5 @@ class Model(pl.LightningModule):
         if self.global_step > 0:
             self.best_metric = self.best_metric if  (self.best_metric > mAP.item()) else mAP.item()
         print ('mAP: {}, Best mAP: {}'.format(mAP.item(), self.best_metric))
+
+        self.val_step_outputs.clear()
