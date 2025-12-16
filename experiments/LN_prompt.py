@@ -34,7 +34,8 @@ if __name__ == '__main__':
     else:
         print ('resuming training from %s'%ckpt_path)
 
-    trainer = Trainer(gpus=-1,
+    trainer = Trainer(accelerator="gpu",
+        devices="auto",
         min_epochs=1, max_epochs=2000,
         benchmark=True,
         logger=logger,
