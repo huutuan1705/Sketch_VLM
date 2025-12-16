@@ -60,11 +60,7 @@ class Model(pl.LightningModule):
 
         loss = self.loss_fn(sk_feat, img_feat, neg_feat)
         self.log('train_loss', loss)
-        self.val_step_outputs.append((
-            sk_feat.detach().cpu(),
-            img_feat.detach().cpu(),
-            list(category)  # category thường là list/tuple string/int
-        ))
+        
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -75,6 +71,11 @@ class Model(pl.LightningModule):
 
         loss = self.loss_fn(sk_feat, img_feat, neg_feat)
         self.log('val_loss', loss)
+        self.val_step_outputs.append((
+            sk_feat.detach().cpu(),
+            img_feat.detach().cpu(),
+            list(category)  # category thường là list/tuple string/int
+        ))
         return sk_feat, img_feat, category
 
     def validation_epoch_end(self):
