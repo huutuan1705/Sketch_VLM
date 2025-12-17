@@ -89,8 +89,10 @@ def train_model(model, opts):
         avg_loss = sum(losses) / len(losses)
         mAP_eval = evaluate_model(model, dataloader_test)
         
+        print('mAP: {:.5f}'.format(mAP_eval))
+        print('Loss:{:.5f}'.format(avg_loss))
+        
         if mAP_eval >= mAP:
             mAP = mAP_eval
             torch.save(model.state_dict(), os.path.join(opts.save_dir, 'best_ckp.pth'))
-        print('mAP: {:.5f}'.format(mAP_eval))
-        print('Loss:{:.5f}'.format(avg_loss))
+        
