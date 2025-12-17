@@ -4,7 +4,7 @@ import torch.nn as nn
 import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-from torchmetrics.retrieval import retrieval_average_precision
+from torchmetrics.functional import retrieval_average_precision
 
 from src.dataset_retrieval import Sketchy
 
