@@ -74,7 +74,7 @@ def train_model(model, opts):
             optimizer.zero_grad()
             
             sk_tensor, img_tensor, neg_tensor, category = batch[:4]
-            sk_tensor, img_tensor, neg_tensor, category = sk_tensor.to(device), img_tensor.to(device), neg_tensor.to(device), category.to(device)
+            sk_tensor, img_tensor, neg_tensor = sk_tensor.to(device), img_tensor.to(device), neg_tensor.to(device)
             img_feat = model(img_tensor, dtype='image')
             sk_feat = model(sk_tensor, dtype='sketch')
             neg_feat = model(neg_tensor, dtype='image')
