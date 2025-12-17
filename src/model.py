@@ -20,8 +20,8 @@ class Model(nn.Module):
         self.clip, _ = clip.load('ViT-B/32', device=device)
         self.clip.apply(freeze_all_but_bn)
         
-        self.sk_prompt = nn.Parameter(torch.randn(self.opts.n_prompts, self.opts.prompt_dim)).to(device)
-        self.img_prompt = nn.Parameter(torch.randn(self.opts.n_prompts, self.opts.prompt_dim)).to(device)
+        self.sk_prompt = nn.Parameter(torch.randn(self.opts.n_prompts, self.opts.prompt_dim))
+        self.img_prompt = nn.Parameter(torch.randn(self.opts.n_prompts, self.opts.prompt_dim))
         
         self.distance_fn = lambda x, y: 1.0 - F.cosine_similarity(x, y)
         

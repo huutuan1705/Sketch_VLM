@@ -70,6 +70,9 @@ def train_model(model, opts):
         losses = []
         
         for _, batch in enumerate(tqdm(dataloader_train)):
+            model.train()
+            optimizer.zero_grad()
+            
             sk_tensor, img_tensor, neg_tensor, category = batch[:4]
             img_feat = model(img_tensor, dtype='image')
             sk_feat = model(sk_tensor, dtype='sketch')
