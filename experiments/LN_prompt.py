@@ -28,20 +28,20 @@ if __name__ == '__main__':
         mode='min',
         save_last=True)
 
-    ckpt_path = os.path.join('saved_models', opts.exp_name, 'last.ckpt')
+    ckpt_path = os.path.join('/kaggle/working/', 'last.ckpt')
     if not os.path.exists(ckpt_path):
         ckpt_path = None
     else:
         print ('resuming training from %s'%ckpt_path)
 
-    trainer = Trainer(accelerator="gpu",
-        min_epochs=1, max_epochs=1,
+    trainer = Trainer(gpus=-1,
+        min_epochs=1, max_epochs=40,
         benchmark=True,
         logger=logger,
         # val_check_interval=10, 
         # accumulate_grad_batches=1,
-        check_val_every_n_epoch=1,
-        # resume_from_checkpoint=ckpt_path,
+        check_val_every_n_epoch=5,
+        resume_from_checkpoint=ckpt_path,
         callbacks=[checkpoint_callback]
     )
 
@@ -52,4 +52,4 @@ if __name__ == '__main__':
         model = Model().load_from_checkpoint(ckpt_path)
 
     print ('beginning training...good luck...')
-    trainer.fit(model, train_loader, val_loader, ckpt_path=ckpt_path)
+    trainer.fit(model, train_loader, val_loader)
