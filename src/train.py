@@ -28,21 +28,21 @@ def evaluate_model(model, dataloader_test):
         for idx, batch in enumerate(tqdm(dataloader_test)):
             sk_tensor, img_tensor, neg_tensor, category = batch[:4]
             sk_tensor, img_tensor, neg_tensor = sk_tensor.to(device), img_tensor.to(device), neg_tensor.to(device)
+            
             img_feat = model(img_tensor, dtype='image')
             sk_feat = model(sk_tensor, dtype='sketch')
             neg_feat = model(neg_tensor, dtype='image')
+            
             val_step_outputs.append((sk_feat, img_feat, category))
             
         Len = len(val_step_outputs)
         if Len == 0:
             return
         
-        print(val_step_outputs[0][2])
         query_feat_all = torch.cat([val_step_outputs[i][0] for i in range(Len)])
         gallery_feat_all = torch.cat([val_step_outputs[i][1] for i in range(Len)])
         all_category = np.array(sum([list(val_step_outputs[i][2]) for i in range(Len)], []))
         
-        print(all_category)
         gallery = gallery_feat_all
         ap = torch.zeros(len(query_feat_all))
         for idx, sk_feat in enumerate(query_feat_all):

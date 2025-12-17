@@ -77,7 +77,7 @@ class Model(pl.LightningModule):
         self.val_step_outputs.append((
             sk_feat.detach().cpu(),
             img_feat.detach().cpu(),
-            list(category)  # category thường là list/tuple string/int
+            category  # category thường là list/tuple string/int
         ))
         return sk_feat, img_feat, category
 
