@@ -7,6 +7,7 @@ import pytorch_lightning as pl
 
 from src.clip import clip
 from experiments.options import opts
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def freeze_model(m):
     m.requires_grad_(False)
@@ -86,13 +87,13 @@ class Model(pl.LightningModule):
         for idx, sk_feat in enumerate(query_feat_all):
             category = all_category[idx]
             distance = -1*self.distance_fn(sk_feat.unsqueeze(0), gallery)
-            target = torch.zeros(len(gallery), dtype=torch.bool)
+            target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
             target[np.where(all_category == category)] = True
             
             # ---- TOP-K ----
             K=200
             k = min(K, target.numel())
-            sorted_idx = torch.argsort(distance, descending=True)
+            sorted_idx = torch.argsort(distance, descending=True, device=device)
             topk_idx = sorted_idx[:k]
             scores_topk = target[topk_idx]
             target_topk = target[topk_idx]
@@ -101,7 +102,7 @@ class Model(pl.LightningModule):
             
             # ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
             
-        mAP = torch.mean(ap)
+        mAP = torch.mean(ap, device=device)
         self.log('mAP', mAP, batch_size=1)
         if self.global_step > 0:
             self.best_metric = self.best_metric if  (self.best_metric > mAP.item()) else mAP.item()
