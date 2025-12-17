@@ -36,7 +36,7 @@ def evaluate_model(model, dataloader_test):
         Len = len(val_step_outputs)
         if Len == 0:
             return
-        
+        print(val_step_outputs[0])
         query_feat_all = torch.cat([val_step_outputs[i][0] for i in range(Len)])
         gallery_feat_all = torch.cat([val_step_outputs[i][1] for i in range(Len)])
         all_category = np.array(sum([list(val_step_outputs[i][2]) for i in range(Len)], []))
@@ -70,23 +70,23 @@ def train_model(model, opts):
         print(f"Epoch: {i_epoch+1} / {opts.epochs}")
         losses = []
         
-        for _, batch in enumerate(tqdm(dataloader_train)):
-            model.train()
-            optimizer.zero_grad()
+        # for _, batch in enumerate(tqdm(dataloader_train)):
+        #     model.train()
+        #     optimizer.zero_grad()
             
-            sk_tensor, img_tensor, neg_tensor, category = batch[:4]
-            sk_tensor, img_tensor, neg_tensor = sk_tensor.to(device), img_tensor.to(device), neg_tensor.to(device)
-            img_feat = model(img_tensor, dtype='image')
-            sk_feat = model(sk_tensor, dtype='sketch')
-            neg_feat = model(neg_tensor, dtype='image')
+        #     sk_tensor, img_tensor, neg_tensor, category = batch[:4]
+        #     sk_tensor, img_tensor, neg_tensor = sk_tensor.to(device), img_tensor.to(device), neg_tensor.to(device)
+        #     img_feat = model(img_tensor, dtype='image')
+        #     sk_feat = model(sk_tensor, dtype='sketch')
+        #     neg_feat = model(neg_tensor, dtype='image')
             
-            loss = loss_fn(sk_feat, img_feat, neg_feat)
-            loss.backward()
-            optimizer.step()
+        #     loss = loss_fn(sk_feat, img_feat, neg_feat)
+        #     loss.backward()
+        #     optimizer.step()
 
-            losses.append(loss.item())
+        #     losses.append(loss.item())
             
-        avg_loss = sum(losses) / len(losses)
+        # avg_loss = sum(losses) / len(losses)
         mAP_eval = evaluate_model(model, dataloader_test)
         
         print('mAP: {:.5f}'.format(mAP_eval))
