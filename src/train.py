@@ -65,7 +65,7 @@ def train_model(model, opts):
             {'params': model.clip.parameters(), 'lr': opts.clip_LN_lr},
             {'params': [model.sk_prompt] + [model.img_prompt], 'lr': opts.prompt_lr}])
     
-    mAP, avg_loss = 0, 0
+    mAP, avg_loss = -1e3, 0
     for i_epoch in range(opts.epochs):
         print(f"Epoch: {i_epoch+1} / {opts.epochs}")
         losses = []
