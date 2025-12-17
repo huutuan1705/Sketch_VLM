@@ -92,5 +92,5 @@ def train_model(model, opts):
         if mAP_eval >= mAP:
             mAP = mAP_eval
             torch.save(model.state_dict(), os.path.join(opts.save_dir, 'best_ckp.pth'))
-            print('mAP: {:.5f}'.format(mAP_eval))
-            print('Loss:{:.5f}'.format(avg_loss))
+        print('mAP: {:.5f}'.format(mAP_eval))
+        print('Loss:{:.5f}'.format(avg_loss))
