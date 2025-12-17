@@ -93,7 +93,7 @@ class Model(pl.LightningModule):
             # ---- TOP-K ----
             K=200
             k = min(K, target.numel())
-            sorted_idx = torch.argsort(distance, descending=True, device=device)
+            sorted_idx = torch.argsort(distance, descending=True)
             topk_idx = sorted_idx[:k]
             scores_topk = target[topk_idx]
             target_topk = target[topk_idx]
@@ -102,7 +102,7 @@ class Model(pl.LightningModule):
             
             # ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
             
-        mAP = torch.mean(ap, device=device)
+        mAP = torch.mean(ap)
         self.log('mAP', mAP, batch_size=1)
         if self.global_step > 0:
             self.best_metric = self.best_metric if  (self.best_metric > mAP.item()) else mAP.item()
