@@ -91,7 +91,7 @@ class Model(pl.LightningModule):
             ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu(), top_k=200)
         
         mAP = torch.mean(ap)
-        self.log('mAP', mAP)
+        self.log('mAP', mAP, batch_size=1)
         if self.global_step > 0:
             self.best_metric = self.best_metric if  (self.best_metric > mAP.item()) else mAP.item()
         print ('mAP: {}, Best mAP: {}'.format(mAP.item(), self.best_metric))
