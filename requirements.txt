@@ -1,6 +1,6 @@
 pytorch==1.13.1
 torchvision==0.14.1
 torchaudio==0.13.1
-pytorch-lightning=1.7.3
+pytorch-lightning==1.7.3
 torchmetrics==0.9.3
 ftfy
