@@ -43,8 +43,8 @@ class Model(pl.LightningModule):
             {'params': [self.sk_prompt] + [self.img_prompt], 'lr': self.opts.prompt_lr}])
         return optimizer
 
-    def on_validation_epoch_start(self):
-        self.val_step_outputs = []
+    # def on_validation_epoch_start(self):
+    #     self.val_step_outputs = []
         
     def forward(self, data, dtype='image'):
         if dtype == 'image':
@@ -102,8 +102,7 @@ class Model(pl.LightningModule):
         
         mAP = torch.mean(ap)
         self.log('mAP', mAP)
-        if self.global_step > 0:
-            self.best_metric = self.best_metric if  (self.best_metric > mAP.item()) else mAP.item()
+        self.best_metric = self.best_metric if  (self.best_metric > mAP.item()) else mAP.item()
         print ('mAP: {}, Best mAP: {}'.format(mAP.item(), self.best_metric))
 
         self.val_step_outputs.clear()
