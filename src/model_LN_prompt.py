@@ -92,7 +92,8 @@ class Model(pl.LightningModule):
             # ---- TOP-K ----
             K=200
             k = min(K, target.numel())
-            topk_idx = torch.topk(target, k=k, largest=True).indices
+            sorted_idx = torch.argsort(distance, descending=True)
+            topk_idx = sorted_idx[:k]
             scores_topk = target[topk_idx]
             target_topk = target[topk_idx]
             # --------------------------
