@@ -28,8 +28,8 @@ class Model(nn.Module):
     def forward(self, data, dtype='image'):
         if dtype == 'image':
             feat = self.clip.encode_image(
-                data, self.img_prompt.expand(data.shape[0], -1, -1)).to(device)
+                data, self.img_prompt.expand(data.shape[0], -1, -1))
         else:
             feat = self.clip.encode_image(
-                data, self.sk_prompt.expand(data.shape[0], -1, -1)).to(device)
+                data, self.sk_prompt.expand(data.shape[0], -1, -1))
         return feat
