@@ -36,7 +36,7 @@ def evaluate_model(model, dataloader_test):
         Len = len(val_step_outputs)
         if Len == 0:
             return
-        print(val_step_outputs[0])
+        print(val_step_outputs[0][2])
         query_feat_all = torch.cat([val_step_outputs[i][0] for i in range(Len)])
         gallery_feat_all = torch.cat([val_step_outputs[i][1] for i in range(Len)])
         all_category = np.array(sum([list(val_step_outputs[i][2]) for i in range(Len)], []))
