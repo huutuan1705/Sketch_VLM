@@ -90,17 +90,7 @@ class Model(pl.LightningModule):
             target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
             target[np.where(all_category == category)] = True
             
-            # ---- TOP-K ----
-            K=200
-            k = min(K, target.numel())
-            sorted_idx = torch.argsort(distance, descending=True)
-            topk_idx = sorted_idx[:k]
-            scores_topk = target[topk_idx]
-            target_topk = target[topk_idx]
-            # --------------------------
-            ap[idx] = retrieval_average_precision(scores_topk.cpu(), target_topk.cpu())
-            
-            # ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
+            ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
             
         mAP = torch.mean(ap)
         self.log('mAP', mAP, batch_size=1)
