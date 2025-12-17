@@ -59,7 +59,7 @@ def train_model(model, opts):
     dataloader_train, dataloader_test = get_dataloader(opts)
     
     loss_fn = nn.TripletMarginWithDistanceLoss(
-            distance_function=model.distance_fn, margin=0.2)
+            distance_function=model.distance_fn, margin=0.3)
     
     optimizer = torch.optim.Adam([
             {'params': model.clip.parameters(), 'lr': opts.clip_LN_lr},
