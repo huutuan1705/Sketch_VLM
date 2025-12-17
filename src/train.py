@@ -4,7 +4,7 @@ import torch.nn as nn
 import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-from torchmetrics.functional import retrieval_average_precision
+from torchmetrics.retrieval import retrieval_average_precision
 
 from src.dataset_retrieval import Sketchy
 
@@ -89,7 +89,7 @@ def train_model(model, opts):
         # avg_loss = sum(losses) / len(losses)
         mAP_eval = evaluate_model(model, dataloader_test)
         
-        if mAP_eval > mAP:
+        if mAP_eval >= mAP:
             mAP = mAP_eval
             torch.save(model.state_dict(), os.path.join(opts.save_dir, 'best_ckp.pth'))
             print('mAP: {:.5f}'.format(mAP_eval))
