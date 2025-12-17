@@ -103,6 +103,6 @@ class Model(pl.LightningModule):
         mAP = torch.mean(ap)
         self.log('mAP', mAP)
         self.best_metric = self.best_metric if  (self.best_metric > mAP.item()) else mAP.item()
-        print ('mAP: {}, Best mAP: {}'.format(mAP.item(), self.best_metric))
+        self.print ('mAP: {}, Best mAP: {}'.format(mAP.item(), self.best_metric))
 
         self.val_step_outputs.clear()
