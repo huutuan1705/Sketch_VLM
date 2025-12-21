@@ -76,23 +76,23 @@ def train_model(model, opts):
         print(f"Epoch: {i_epoch+1} / {opts.epochs}")
         losses = []
         
-        # for _, batch in enumerate(tqdm(dataloader_train)):
-        #     model.train()
-        #     optimizer.zero_grad()
+        for _, batch in enumerate(tqdm(dataloader_train)):
+            model.train()
+            optimizer.zero_grad()
             
-        #     sk_tensor, img_tensor, neg_tensor, category = batch[:4]
-        #     sk_tensor, img_tensor, neg_tensor = sk_tensor.to(device), img_tensor.to(device), neg_tensor.to(device)
-        #     img_feat = model(img_tensor, dtype='image')
-        #     sk_feat = model(sk_tensor, dtype='sketch')
-        #     neg_feat = model(neg_tensor, dtype='image')
+            sk_tensor, img_tensor, neg_tensor, category = batch[:4]
+            sk_tensor, img_tensor, neg_tensor = sk_tensor.to(device), img_tensor.to(device), neg_tensor.to(device)
+            img_feat = model(img_tensor, dtype='image')
+            sk_feat = model(sk_tensor, dtype='sketch')
+            neg_feat = model(neg_tensor, dtype='image')
             
-        #     loss = loss_fn(sk_feat, img_feat, neg_feat)
-        #     loss.backward()
-        #     optimizer.step()
+            loss = loss_fn(sk_feat, img_feat, neg_feat)
+            loss.backward()
+            optimizer.step()
 
-        #     losses.append(loss.item())
+            losses.append(loss.item())
             
-        # avg_loss = sum(losses) / len(losses)
+        avg_loss = sum(losses) / len(losses)
         mAP_eval = evaluate_model(model, dataloader_test)
         
         print('mAP: {:.5f}'.format(mAP_eval))
