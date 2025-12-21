@@ -24,6 +24,9 @@ class Model(nn.Module):
         self.img_prompt = nn.Parameter(torch.randn(self.opts.n_prompts, self.opts.prompt_dim))
         
         self.distance_fn = lambda x, y: 1.0 - F.cosine_similarity(x, y)
+        self.loss_fn = nn.TripletMarginWithDistanceLoss(
+            distance_function=self.distance_fn, margin=0.3
+        )
         
     def forward(self, data, dtype='image'):
         if dtype == 'image':
