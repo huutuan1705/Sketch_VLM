@@ -43,10 +43,6 @@ def evaluate_model(model, dataloader_test):
         gallery_feat_all = torch.cat([val_step_outputs[i][1] for i in range(Len)])
         all_category = np.array(sum([list(val_step_outputs[i][2]) for i in range(Len)], []))
         
-        print(len(query_feat_all))
-        print(len(gallery_feat_all))
-        print(len(all_category))
-        
         gallery = gallery_feat_all
         ap = torch.zeros(len(query_feat_all))
         for idx, sk_feat in enumerate(query_feat_all):
@@ -69,15 +65,15 @@ def train_model(model, opts):
     
     optimizer = torch.optim.Adam([
             {'params': model.clip.parameters(), 'lr': opts.clip_LN_lr},
-            {'params': [model.sk_prompt] + [model.img_prompt], 'lr': opts.prompt_lr}])
+            {'params': [model.sk_prompt, model.img_prompt], 'lr': opts.prompt_lr}])
     
     mAP, avg_loss = -1e3, 0
     for i_epoch in range(opts.epochs):
         print(f"Epoch: {i_epoch+1} / {opts.epochs}")
         losses = []
-        
+        model.train()
         for _, batch in enumerate(tqdm(dataloader_train)):
-            model.train()
+            
             optimizer.zero_grad()
             
             sk_tensor, img_tensor, neg_tensor, category = batch[:4]
