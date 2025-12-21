@@ -55,7 +55,7 @@ def evaluate_model(model, dataloader_test):
             target = torch.zeros(len(gallery), dtype=torch.bool)
             
             target[np.where(all_category == category)[0]] = True
-            ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu(), top_k=200)
+            ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
         
         mAP = torch.mean(ap)
         return mAP.item()
