@@ -29,9 +29,9 @@ def evaluate_model(model, dataloader_test):
             sk_tensor, img_tensor, neg_tensor, category = batch[:4]
             sk_tensor, img_tensor, neg_tensor = sk_tensor.to(device), img_tensor.to(device), neg_tensor.to(device)
             
-            img_feat = model(img_tensor, dtype='image')
-            sk_feat = model(sk_tensor, dtype='sketch')
-            neg_feat = model(neg_tensor, dtype='image')
+            img_feat = model.forward(img_tensor, dtype='image')
+            sk_feat = model.forward(sk_tensor, dtype='sketch')
+            neg_feat = model.forward(neg_tensor, dtype='image')
             
             val_step_outputs.append((sk_feat, img_feat, category))
             
@@ -78,9 +78,9 @@ def train_model(model, opts):
             
             sk_tensor, img_tensor, neg_tensor, category = batch[:4]
             sk_tensor, img_tensor, neg_tensor = sk_tensor.to(device), img_tensor.to(device), neg_tensor.to(device)
-            img_feat = model(img_tensor, dtype='image')
-            sk_feat = model(sk_tensor, dtype='sketch')
-            neg_feat = model(neg_tensor, dtype='image')
+            img_feat = model.forward(img_tensor, dtype='image')
+            sk_feat = model.forward(sk_tensor, dtype='sketch')
+            neg_feat = model.forward(neg_tensor, dtype='image')
             
             loss = loss_fn(sk_feat, img_feat, neg_feat)
             loss.backward()
