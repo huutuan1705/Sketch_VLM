@@ -24,9 +24,7 @@ def get_dataloader(opts):
 def evaluate_model(model, dataloader_test):
     with torch.no_grad():
         model.eval()
-        sk_feats = []
-        img_feats = []
-        cats = []
+        val_step_outputs = []
         for idx, batch in enumerate(tqdm(dataloader_test)):
             sk_tensor, img_tensor, neg_tensor, category = batch[:4]
             sk_tensor, img_tensor, neg_tensor = sk_tensor.to(device), img_tensor.to(device), neg_tensor.to(device)
@@ -35,30 +33,29 @@ def evaluate_model(model, dataloader_test):
             sk_feat = model(sk_tensor, dtype='sketch')
             neg_feat = model(neg_tensor, dtype='image')
             
-            sk_feats.append(sk_feat.detach())
-            img_feats.append(img_feat.detach())
+            val_step_outputs.append((sk_feat, img_feat, category))
             
-        if torch.is_tensor(category):
-            cats.extend(category.detach().cpu().tolist())
-        else:
-            cats.extend(list(category))
+        Len = len(val_step_outputs)
+        if Len == 0:
+            return
         
-        query_feat_all = torch.cat(sk_feats, dim=0)
-        gallery_feat_all = torch.cat(img_feats, dim=0)
-        all_category = np.array(cats)
-        
-        gallery = gallery_feat_all
+        query_feat_all = torch.cat([val_step_outputs[i][0] for i in range(Len)])
+        gallery_feat_all = torch.cat([val_step_outputs[i][1] for i in range(Len)])
+        all_category = np.array(sum([list(val_step_outputs[i][2]) for i in range(Len)], []))
         
         print(len(query_feat_all))
+        print(len(gallery_feat_all))
         print(len(all_category))
+        
+        gallery = gallery_feat_all
         ap = torch.zeros(len(query_feat_all))
         for idx, sk_feat in enumerate(query_feat_all):
             category = all_category[idx]
             distance = -1*model.distance_fn(sk_feat.unsqueeze(0), gallery)
             target = torch.zeros(len(gallery), dtype=torch.bool)
             
-            target[np.where(all_category == category)[0]] = True
-            ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
+            target[np.where(all_category == category)] = True
+            ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu(), top_k=200)
         
         mAP = torch.mean(ap)
         return mAP.item()
@@ -77,7 +74,7 @@ def train_model(model, opts):
     mAP, avg_loss = -1e3, 0
     for i_epoch in range(opts.epochs):
         print(f"Epoch: {i_epoch+1} / {opts.epochs}")
-        # losses = []
+        losses = []
         
         # for _, batch in enumerate(tqdm(dataloader_train)):
         #     model.train()
