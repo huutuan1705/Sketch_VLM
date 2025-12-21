@@ -48,8 +48,11 @@ def evaluate_model(model, dataloader_test):
         all_category = np.array(cats)
         
         gallery = gallery_feat_all
+        
+        print(len(query_feat_all))
         ap = torch.zeros(len(query_feat_all))
         for idx, sk_feat in enumerate(query_feat_all):
+            print(idx)
             category = all_category[idx]
             distance = -1*model.distance_fn(sk_feat.unsqueeze(0), gallery)
             target = torch.zeros(len(gallery), dtype=torch.bool)
