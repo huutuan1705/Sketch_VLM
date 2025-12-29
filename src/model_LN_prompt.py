@@ -80,17 +80,27 @@ class Model(pl.LightningModule):
         gallery_feat_all = torch.cat([val_step_outputs[i][1] for i in range(Len)])
         all_category = np.array(sum([list(val_step_outputs[i][2]) for i in range(Len)], []))
 
-
         ## mAP category-level SBIR Metrics
         gallery = gallery_feat_all
         ap = torch.zeros(len(query_feat_all))
+        top_k = 200
+        
         for idx, sk_feat in enumerate(query_feat_all):
             category = all_category[idx]
             distance = -1*self.distance_fn(sk_feat.unsqueeze(0), gallery)
-            target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
-            target[np.where(all_category == category)] = True
             
-            ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
+            top_k_actual = min(top_k, len(gallery)) 
+            top_values, top_indices = torch.topk(distance, top_k_actual, largest=True)
+            
+            # target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
+            # target[np.where(all_category == category)] = True
+            # ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
+            
+            target_all = torch.zeros(len(gallery), dtype=torch.bool, device=distance.device)
+            target_all[np.where(all_category == category)] = True
+            target_top_k = target_all[top_indices]
+            
+            ap[idx] = retrieval_average_precision(top_values.cpu(), target_top_k.cpu())
             
         mAP = torch.mean(ap)
         self.log('mAP', mAP, batch_size=1)
