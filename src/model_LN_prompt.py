@@ -110,4 +110,4 @@ class Model(pl.LightningModule):
         self.log('mAP', mAP, batch_size=1)
         if self.global_step > 0:
             self.best_metric = self.best_metric if  (self.best_metric > mAP.item()) else mAP.item()
-        print ('mAP: {}, p@all: {}, Best mAP: {}'.format(mAP.item(), mpr.item(), self.best_metric))
+        print ('mAP@200: {}, p@200: {}, Best mAP: {}'.format(mAP.item(), mpr.item(), self.best_metric))
