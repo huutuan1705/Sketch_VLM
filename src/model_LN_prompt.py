@@ -90,17 +90,18 @@ class Model(pl.LightningModule):
             distance = -1*self.distance_fn(sk_feat.unsqueeze(0), gallery)
             
             top_k_actual = min(top_k, len(gallery)) 
-            top_values, top_indices = torch.topk(distance, top_k_actual, largest=True)
+            # top_values, top_indices = torch.topk(distance, top_k_actual, largest=True)
             
-            # target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
-            # target[np.where(all_category == category)] = True
-            # ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
+            target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
+            target[np.where(all_category == category)] = True
+            distance = distance[:top_k_actual]
+            target = target[:top_k_actual]
+            ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
             
-            target_all = torch.zeros(len(gallery), dtype=torch.bool, device=distance.device)
-            target_all[np.where(all_category == category)] = True
-            target_top_k = target_all[top_indices]
-            
-            ap[idx] = retrieval_average_precision(top_values.cpu(), target_top_k.cpu())
+            # target_all = torch.zeros(len(gallery), dtype=torch.bool, device=distance.device)
+            # target_all[np.where(all_category == category)] = True
+            # target_top_k = target_all[top_indices]
+            # ap[idx] = retrieval_average_precision(top_values.cpu(), target_top_k.cpu())
             
         mAP = torch.mean(ap)
         self.log('mAP', mAP, batch_size=1)
