@@ -94,8 +94,8 @@ class Model(pl.LightningModule):
             
             target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
             target[np.where(all_category == category)] = True
-            distance = distance[:top_k_actual]
-            target = target[:top_k_actual]
+            # distance = distance[:top_k_actual]
+            # target = target[:top_k_actual]
             ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
             
             # target_all = torch.zeros(len(gallery), dtype=torch.bool, device=distance.device)
