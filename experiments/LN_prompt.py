@@ -42,7 +42,7 @@ if __name__ == '__main__':
         # accumulate_grad_batches=1,
         check_val_every_n_epoch=1,
         resume_from_checkpoint=ckpt_path,
-        enable_progress_bar=True,
+        enable_progress_bar=False,
         callbacks=[checkpoint_callback]
     )
 
