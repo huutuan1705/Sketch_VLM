@@ -100,7 +100,7 @@ class Model(pl.LightningModule):
         
         for idx, sk_feat in enumerate(query_feat_all):
             category = all_category[idx]
-            distance = -1*self.distance_fn(sk_feat.unsqueeze(0), gallery)
+            distance = 1 - self.distance_fn(sk_feat.unsqueeze(0), gallery)
             
             top_k_actual = min(top_k, len(gallery)) 
             top_values, top_indices = torch.topk(distance, top_k_actual, largest=True)
