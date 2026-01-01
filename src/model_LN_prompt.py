@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchmetrics.functional import retrieval_average_precision
+from torchmetrics.functional.retrieval import retrieval_average_precision
 import pytorch_lightning as pl
 
 from src.clip import clip
@@ -106,9 +106,6 @@ class Model(pl.LightningModule):
             
             # target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
             target = (all_category == category)
-            print(target.shape)
-            print(distance.shape)
-            # print(len(target))
             
             ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
             
