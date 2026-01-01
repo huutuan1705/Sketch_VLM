@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchmetrics.functional.retrieval import retrieval_average_precision
+from torchmetrics.functional import retrieval_average_precision
 import pytorch_lightning as pl
 
 from src.clip import clip
@@ -90,8 +90,7 @@ class Model(pl.LightningModule):
             return
         query_feat_all = torch.cat([val_step_outputs[i]["sk_feat"] for i in range(Len)])
         gallery_feat_all = torch.cat([val_step_outputs[i]["img_feat"] for i in range(Len)])
-        all_category = torch.cat([val_step_outputs[i]["category"] for i in range(Len)])
-        # all_category = np.array(sum([list(val_step_outputs[i]["category"]) for i in range(Len)], []))
+        all_category = np.array(sum([list(val_step_outputs[i]["category"]) for i in range(Len)], []))
 
         ## mAP category-level SBIR Metrics
         gallery = gallery_feat_all
@@ -101,12 +100,14 @@ class Model(pl.LightningModule):
         
         for idx, sk_feat in enumerate(query_feat_all):
             category = all_category[idx]
-            distance = 1*self.distance_fn(sk_feat.unsqueeze(0), gallery)
+            distance = -1*self.distance_fn(sk_feat.unsqueeze(0), gallery)
+            
             top_k_actual = min(top_k, len(gallery)) 
+            top_values, top_indices = torch.topk(distance, top_k_actual, largest=True)
             
-            # target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
-            target = (all_category == category)
-            
+            target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
+            target[np.where(all_category == category)] = True
+            print(distance)
             ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
             
         mAP = torch.mean(ap)
