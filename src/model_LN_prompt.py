@@ -56,6 +56,9 @@ class Model(pl.LightningModule):
         return feat
 
     def training_step(self, batch, batch_idx):
+        self.clip.train()
+        self.sk_prompt.train()
+        self.img_prompt.train()
         optimizer = self.optimizers()
         optimizer.zero_grad()
         
