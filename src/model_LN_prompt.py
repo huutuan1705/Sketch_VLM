@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchmetrics.functional import retrieval_average_precision, retrieval_precision
+from torchmetrics.retrieval import RetrievalMAP, RetrievalPrecision
 import pytorch_lightning as pl
 
 from src.clip import clip
@@ -93,17 +94,21 @@ class Model(pl.LightningModule):
             top_k_actual = min(top_k, len(gallery)) 
             top_values, top_indices = torch.topk(distance, top_k_actual, largest=True)
             
-            # target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
-            # target[np.where(all_category == category)] = True
+            target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
+            target[np.where(all_category == category)] = True
+            map200 = RetrievalMAP(top_k=200)
+            p200 = RetrievalPrecision(top_k=200)
+            ap[idx] = map200(distance.cpu(), target.cpu())
+            pr[idx] = p200(distance.cpu(), target.cpu())
             # ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
             # pr[idx] = retrieval_precision(distance.cpu(), target.cpu())
             
-            target_all = torch.zeros(len(gallery), dtype=torch.bool, device=distance.device)
-            target_all[np.where(all_category == category)] = True
-            target_top_k = target_all[top_indices]
-            distance_top_k = distance[top_indices]
-            ap[idx] = retrieval_average_precision(distance_top_k.cpu(), target_top_k.cpu())
-            pr[idx] = retrieval_precision(distance_top_k.cpu(), target_top_k.cpu())
+            # target_all = torch.zeros(len(gallery), dtype=torch.bool, device=distance.device)
+            # target_all[np.where(all_category == category)] = True
+            # target_top_k = target_all[top_indices]
+            # distance_top_k = distance[top_indices]
+            # ap[idx] = retrieval_average_precision(distance_top_k.cpu(), target_top_k.cpu())
+            # pr[idx] = retrieval_precision(distance_top_k.cpu(), target_top_k.cpu())
             
         mAP = torch.mean(ap)
         mpr = torch.mean(pr)
