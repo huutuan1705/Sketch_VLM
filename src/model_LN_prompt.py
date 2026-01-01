@@ -106,8 +106,8 @@ class Model(pl.LightningModule):
             top_k_actual = min(top_k, len(gallery)) 
             top_values, top_indices = torch.topk(distance, top_k_actual, largest=True)
             
-            target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
-            target[np.where(all_category == category)] = True
+            # target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
+            target = (all_category == category)
             
             ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu(), top_k=top_k_actual)
             
