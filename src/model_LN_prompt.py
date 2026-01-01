@@ -3,8 +3,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchmetrics.functional import retrieval_average_precision
-
-from torchmetrics.retrieval import RetrievalMAP, RetrievalPrecision
 import pytorch_lightning as pl
 
 from src.clip import clip
@@ -56,20 +54,12 @@ class Model(pl.LightningModule):
         return feat
 
     def training_step(self, batch, batch_idx):
-        self.clip.train()
-        # self.sk_prompt.train()
-        # self.img_prompt.train()
-        optimizer = self.optimizers()
-        optimizer.zero_grad()
-        
         sk_tensor, img_tensor, neg_tensor, category = batch[:4]
         img_feat = self.forward(img_tensor, dtype='image')
         sk_feat = self.forward(sk_tensor, dtype='sketch')
         neg_feat = self.forward(neg_tensor, dtype='image')
 
         loss = self.loss_fn(sk_feat, img_feat, neg_feat)
-        # self.backward(loss)
-        optimizer.step()
         self.log('train_loss', loss)
         self.train_output.append(loss.item())
         
@@ -100,7 +90,8 @@ class Model(pl.LightningModule):
             return
         query_feat_all = torch.cat([val_step_outputs[i]["sk_feat"] for i in range(Len)])
         gallery_feat_all = torch.cat([val_step_outputs[i]["img_feat"] for i in range(Len)])
-        all_category = np.array(sum([list(val_step_outputs[i]["category"]) for i in range(Len)], []))
+        all_category = torch.cat([val_step_outputs[i]["category"] for i in range(Len)])
+        # all_category = np.array(sum([list(val_step_outputs[i]["category"]) for i in range(Len)], []))
 
         ## mAP category-level SBIR Metrics
         gallery = gallery_feat_all
@@ -118,15 +109,7 @@ class Model(pl.LightningModule):
             target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
             target[np.where(all_category == category)] = True
             
-            ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
-            # pr[idx] = retrieval_precision(distance.cpu(), target.cpu())
-            
-            # target_all = torch.zeros(len(gallery), dtype=torch.bool, device=distance.device)
-            # target_all[np.where(all_category == category)] = True
-            # target_top_k = target_all[top_indices]
-            # distance_top_k = distance[top_indices]
-            # ap[idx] = retrieval_average_precision(distance_top_k.cpu(), target_top_k.cpu())
-            # pr[idx] = retrieval_precision(distance_top_k.cpu(), target_top_k.cpu())
+            ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu(), top_k=top_k_actual)
             
         mAP = torch.mean(ap)
         mpr = torch.mean(pr)
