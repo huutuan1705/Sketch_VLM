@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchmetrics.functional import retrieval_average_precision
+from torchmetrics.functional import retrieval_average_precision, retrieval_precision
 import pytorch_lightning as pl
 
 from src.clip import clip
@@ -109,6 +109,7 @@ class Model(pl.LightningModule):
             target[np.where(all_category == category)] = True
             # print(distance)
             ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu(), top_k=top_k_actual)
+            pr[idx] = retrieval_precision(distance.cpu(), target.cpu(), top_k=top_k_actual)
             
         mAP = torch.mean(ap)
         mpr = torch.mean(pr)
