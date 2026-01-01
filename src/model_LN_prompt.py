@@ -107,7 +107,7 @@ class Model(pl.LightningModule):
             
             target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
             target[np.where(all_category == category)] = True
-            print(distance)
+            # print(distance)
             ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
             
         mAP = torch.mean(ap)
