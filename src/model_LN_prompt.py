@@ -103,7 +103,7 @@ class Model(pl.LightningModule):
             # indexes = torch.zeros(len(gallery), dtype=torch.long, device=distance.device)
             # ap[idx] = map200(distance.cpu(), target.cpu(), indexes=indexes)
             # pr[idx] = p200(distance.cpu(), target.cpu(), indexes=indexes)
-            ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
+            ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu(), top_k=200)
             # pr[idx] = retrieval_precision(distance.cpu(), target.cpu())
             
             # target_all = torch.zeros(len(gallery), dtype=torch.bool, device=distance.device)
