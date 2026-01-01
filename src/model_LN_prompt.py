@@ -2,7 +2,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchmetrics.functional import retrieval_average_precision, retrieval_precision
+from torchmetrics.functional.retrieval.average_precision import retrieval_average_precision
+
 from torchmetrics.retrieval import RetrievalMAP, RetrievalPrecision
 import pytorch_lightning as pl
 
@@ -97,12 +98,12 @@ class Model(pl.LightningModule):
             target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
             target[np.where(all_category == category)] = True
             
-            map200 = RetrievalMAP(top_k=200)
-            p200 = RetrievalPrecision(top_k=200)
-            indexes = torch.zeros(len(gallery), dtype=torch.long, device=distance.device)
-            ap[idx] = map200(distance.cpu(), target.cpu(), indexes=indexes)
-            pr[idx] = p200(distance.cpu(), target.cpu(), indexes=indexes)
-            # ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
+            # map200 = RetrievalMAP(top_k=200)
+            # p200 = RetrievalPrecision(top_k=200)
+            # indexes = torch.zeros(len(gallery), dtype=torch.long, device=distance.device)
+            # ap[idx] = map200(distance.cpu(), target.cpu(), indexes=indexes)
+            # pr[idx] = p200(distance.cpu(), target.cpu(), indexes=indexes)
+            ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
             # pr[idx] = retrieval_precision(distance.cpu(), target.cpu())
             
             # target_all = torch.zeros(len(gallery), dtype=torch.bool, device=distance.device)
