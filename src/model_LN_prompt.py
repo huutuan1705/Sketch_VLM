@@ -65,7 +65,7 @@ class Model(pl.LightningModule):
         neg_feat = self.forward(neg_tensor, dtype='image')
 
         loss = self.loss_fn(sk_feat, img_feat, neg_feat)
-        self.backward(loss)
+        # self.backward(loss)
         optimizer.step()
         self.log('train_loss', loss)
         self.train_output.append(loss.item())
