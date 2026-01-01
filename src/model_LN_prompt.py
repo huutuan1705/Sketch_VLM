@@ -102,16 +102,15 @@ class Model(pl.LightningModule):
         for idx, sk_feat in enumerate(query_feat_all):
             category = all_category[idx]
             distance = -1*self.distance_fn(sk_feat.unsqueeze(0), gallery)
-            
             top_k_actual = min(top_k, len(gallery)) 
-            top_values, top_indices = torch.topk(distance, top_k_actual, largest=True)
             
             # target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
             target = (all_category == category)
-            print(target)
-            print(len(target))
+            print(target.shape)
+            print(distance.shape)
+            # print(len(target))
             
-            ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu(), top_k=top_k_actual)
+            ap[idx] = retrieval_average_precision(distance.cpu(), target.cpu())
             
         mAP = torch.mean(ap)
         mpr = torch.mean(pr)
