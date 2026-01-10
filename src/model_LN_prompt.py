@@ -37,6 +37,10 @@ class Model(pl.LightningModule):
         self.val_step_outputs = []
         self.train_output = []
         self.best_metric = -1e3
+        
+        for name, p in self.model.named_parameters():
+            if p.requires_grad == True:
+                print(name)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam([
@@ -103,7 +107,6 @@ class Model(pl.LightningModule):
             distance = 1 - self.distance_fn(sk_feat.unsqueeze(0), gallery)
             
             top_k_actual = min(top_k, len(gallery)) 
-            top_values, top_indices = torch.topk(distance, top_k_actual, largest=True)
             
             target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
             target[np.where(all_category == category)] = True
