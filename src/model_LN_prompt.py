@@ -38,9 +38,7 @@ class Model(pl.LightningModule):
         self.train_output = []
         self.best_metric = -1e3
         
-        for name, p in self.model.named_parameters():
-            if p.requires_grad == True:
-                print(name)
+        
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam([
