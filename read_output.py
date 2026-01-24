@@ -1,7 +1,7 @@
 from tensorboard.backend.event_processing import event_accumulator
 
 # Đường dẫn tới file event
-event_file = "events.out.tfevents.1765986614.cea12525cbc9.70.0"
+event_file = "events.out.tfevents.1768886380.5a8f612aea4b.122.0"
 
 # Load event
 ea = event_accumulator.EventAccumulator(
@@ -16,7 +16,7 @@ ea.Reload()
 print("Available scalars:")
 print(ea.Tags()['scalars'])
 # Lấy scalar mAP
-map_events = ea.Scalars('mAP')
+map_events = ea.Scalars('train_loss')
 
 for e in map_events:
     print(f"Step={e.step}, Value={e.value:.4f}")
