@@ -48,9 +48,9 @@ if __name__ == '__main__':
 
     if ckpt_path is None:
         model = Model()
-        for name, p in model.named_parameters():
-            if p.requires_grad == True:
-                print(name)
+        # for name, p in model.named_parameters():
+        #     if p.requires_grad == True:
+        #         print(name)
     else:
         print ('resuming training from %s'%ckpt_path)
         model = Model().load_from_checkpoint(ckpt_path)
