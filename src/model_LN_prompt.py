@@ -74,10 +74,10 @@ class Model(pl.LightningModule):
         img_tensor, category = batch[:4]
         if dataloader_idx == 0:
             img_feat = self.forward(img_tensor, dtype='image')
-            self.val_step_outputs_sk.append((img_feat, category))
+            self.val_step_outputs_sk.append([img_feat, category])
         else:
             sk_feat = self.forward(img_tensor, dtype='sketch')
-            self.val_step_outputs_ph.append((sk_feat, category))
+            self.val_step_outputs_ph.append([sk_feat, category])
 
         loss = 0
         self.log('val_loss', loss)
