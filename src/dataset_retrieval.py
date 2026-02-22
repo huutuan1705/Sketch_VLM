@@ -6,36 +6,27 @@ from torchvision import transforms
 from PIL import Image, ImageOps
 
 unseen_classes = [
-   "banana",
-        "bus",
-        "tractor",
-        "suitcase",
-        "streetlight",
-        "telephone",
-        "bottle opener",
-        "canoe",
-        "fan",
-        "teacup",
-        "penguin",
-        "laptop",
-        "shoe",
-        "lighter",
-        "hot air balloon",
-        "pizza",
-        "brain",
-        "ant",
-        "t-shirt",
-        "trombone",
-        "windmill",
-        "snowboard",
-        "table",
-        "rollerblades",
-        "parachute",
-        "space shuttle",
-        "bridge",
-        "frying-pan",
-        "bread",
-        "horse",
+    "bat",
+    "cabin",
+    "cow",
+    "dolphin",
+    "door",
+    "giraffe",
+    "helicopter",
+    "mouse",
+    "pear",
+    "raccoon",
+    "rhinoceros",
+    "saw",
+    "scissors",
+    "seagull",
+    "skyscraper",
+    "songbird",
+    "sword",
+    "tree",
+    "wheelchair",
+    "windmill",
+    "window",
 ]
 
 class Sketchy(torch.utils.data.Dataset):
@@ -107,25 +98,39 @@ class Sketchy(torch.utils.data.Dataset):
         ])
         return dataset_transforms
 
+def normal_transform():
+    dataset_transforms = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+    return dataset_transforms
 
-if __name__ == '__main__':
-    from experiments.options import opts
-    import tqdm
+class ValidDataset(torch.utils.data.Dataset):
+    def __init__(self, args, mode='photo'):
+        super(ValidDataset, self).__init__()
+        self.args = args
+        self.mode = mode
+        self.transform = normal_transform()
+        unseen_classes = unseen_classes
+        self.all_categories = list(set(unseen_classes))
 
-    dataset_transforms = Sketchy.data_transform(opts)
-    dataset_train = Sketchy(opts, dataset_transforms, mode='train', return_orig=True)
-    dataset_val = Sketchy(opts, dataset_transforms, mode='val', used_cat=dataset_train.all_categories, return_orig=True)
+        self.paths = []
+        for category in self.all_categories:
+            if self.mode == "photo":
+                self.paths.extend(glob.glob(os.path.join(self.args.root, 'sketch', category, '*')))
+            else:
+                self.paths.extend(glob.glob(os.path.join(self.args.root, 'photo', category, '*')))
 
-    idx = 0
-    for data in tqdm.tqdm(dataset_val):
-        continue
-        (sk_tensor, img_tensor, neg_tensor, filename,
-            sk_data, img_data, neg_data) = data
+    def __getitem__(self, index):
+        filepath = self.paths[index]                
+        category = filepath.split(os.path.sep)[-2]
+        
+        image = ImageOps.pad(Image.open(filepath).convert('RGB'),  size=(self.args.max_size, self.args.max_size))
+        image_tensor = self.transform(image)
+        
+        return image_tensor, category
+    
+    def __len__(self):
+        return len(self.paths)
 
-        canvas = Image.new('RGB', (224*3, 224))
-        offset = 0
-        for im in [sk_data, img_data, neg_data]:
-            canvas.paste(im, (offset, 0))
-            offset += im.size[0]
-        canvas.save('output/%d.jpg'%idx)
-        idx += 1

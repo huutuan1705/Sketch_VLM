@@ -7,24 +7,26 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
 
 from src.model_LN_prompt import Model
-from src.dataset_retrieval import Sketchy
+from src.dataset_retrieval import Sketchy, ValidDataset
 from experiments.options import opts
 
 if __name__ == '__main__':
     dataset_transforms = Sketchy.data_transform(opts)
 
     train_dataset = Sketchy(opts, dataset_transforms, mode='train', return_orig=False)
-    val_dataset = Sketchy(opts, dataset_transforms, mode='val', used_cat=train_dataset.all_categories, return_orig=False)
+    val_sketch = ValidDataset(opts, mode='sketch')
+    val_photo = ValidDataset(opts)
 
     train_loader = DataLoader(dataset=train_dataset, batch_size=opts.batch_size, num_workers=opts.workers)
-    val_loader = DataLoader(dataset=val_dataset, batch_size=opts.batch_size, num_workers=opts.workers)
+    val_sketch_loader = DataLoader(dataset=val_sketch, batch_size=opts.test_batch_size, num_workers=opts.workers, shuffle=True)
+    val_photo_loader = DataLoader(dataset=val_sketch, batch_size=opts.test_batch_size, num_workers=opts.workers, shuffle=True)
 
     logger = TensorBoardLogger('tb_logs', name=opts.exp_name)
 
     checkpoint_callback = ModelCheckpoint(
-        monitor='val_loss',
+        monitor='mAP',
         dirpath='saved_models/%s'%opts.exp_name,
-        filename="{epoch:02d}-{top10:.2f}",
+        filename="{epoch:02d}-{mAP:.2f}",
         mode='min',
         save_last=True)
 
@@ -56,4 +58,4 @@ if __name__ == '__main__':
         model = Model().load_from_checkpoint(ckpt_path)
 
     print ('beginning training...good luck...')
-    trainer.fit(model, train_loader, val_loader)
+    trainer.fit(model, train_loader, [val_sketch_loader, val_photo_loader])
