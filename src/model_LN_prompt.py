@@ -31,6 +31,7 @@ class Model(pl.LightningModule):
         self.sk_prompt = nn.Parameter(torch.randn(self.opts.n_prompts, self.opts.prompt_dim))
         self.img_prompt = nn.Parameter(torch.randn(self.opts.n_prompts, self.opts.prompt_dim))
 
+        self.distance = lambda x, y: F.cosine_similarity(x, y)
         self.distance_fn = lambda x, y: 1.0 - F.cosine_similarity(x, y)
         self.loss_fn = nn.TripletMarginWithDistanceLoss(
             distance_function=self.distance_fn, margin=0.2)
@@ -101,7 +102,7 @@ class Model(pl.LightningModule):
                 
         for idx, sk_feat in enumerate(query_feat_all):
             category = all_sketch_category[idx]
-            distance = self.distance_fn(sk_feat.unsqueeze(0), gallery)
+            distance = self.distance(sk_feat.unsqueeze(0), gallery)
             target = torch.zeros(len(gallery), dtype=torch.bool, device=device)
             target[np.where(all_photo_category == category)] = True
             
