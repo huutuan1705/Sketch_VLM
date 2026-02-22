@@ -84,10 +84,10 @@ class Sketchy(torch.utils.data.Dataset):
         neg_tensor = self.transform(neg_data)
         
         if self.return_orig:
-            return sk_tensor, img_tensor, neg_tensor, category, filename, \
+            return sk_tensor, img_tensor, neg_tensor, self.all_categories.index(category), filename, \
                 sk_data, img_data, neg_data
         else:
-            return sk_tensor, img_tensor, neg_tensor, category, filename
+            return sk_tensor, img_tensor, neg_tensor, self.all_categories.index(category), filename
 
     @staticmethod
     def data_transform(opts):
@@ -128,7 +128,7 @@ class ValidDataset(torch.utils.data.Dataset):
         image = ImageOps.pad(Image.open(filepath).convert('RGB'),  size=(self.args.max_size, self.args.max_size))
         image_tensor = self.transform(image)
         
-        return image_tensor, category
+        return image_tensor, self.all_categories.index(category)
     
     def __len__(self):
         return len(self.paths)
