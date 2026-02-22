@@ -71,7 +71,7 @@ class Model(pl.LightningModule):
         self.train_output.clear()
 
     def validation_step(self, batch, batch_idx, dataloader_idx):
-        img_tensor, category = batch[:4]
+        img_tensor, category = batch
         if dataloader_idx == 0:
             img_feat = self.forward(img_tensor, dtype='image')
             self.val_step_outputs_sk.append([img_feat, category])
